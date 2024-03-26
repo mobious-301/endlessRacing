@@ -206,7 +206,9 @@ public class WorldGeneratercopy : MonoBehaviour
 				
 				//now use our perlin scale and offset to create x and z values for the perlin noise
 				float pX = (vertices[index].x * perlinScale) + offset;
+				// pX= vertices[index].x/(xCount-1);
 				float pZ = (vertices[index].z * perlinScale) + offset;
+				// pZ=vertices[index].z*0.06f+100;
 				// pZ=vertices[index].z/vertices[vertices.Length-xCount-zCount].z*8%1;
 				// Debug.Log(pZ);
 				

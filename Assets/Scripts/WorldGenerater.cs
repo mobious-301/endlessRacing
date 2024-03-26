@@ -9,7 +9,8 @@ public class WorldGenerater : MonoBehaviour
     public Material material;
     public Vector2 dimensions;
 
-    public float scale;
+    // public float scale;
+	//取消scale使其默认值为一.保证z的重复性
     public float perlinScale;
     
     public float offset;
@@ -25,7 +26,7 @@ public class WorldGenerater : MonoBehaviour
 		void GeneratWorldPice(int i){
 		//初始化位置
 		pieces[i]= CreateCyLinder();
-		pieces[i].transform.Translate(Vector3.forward*(dimensions.y-1)*scale*Mathf.PI*i);
+		pieces[i].transform.Translate(Vector3.forward*(dimensions.y-1)*Mathf.PI*i);
 
 		//函数标记尾部位置 z=z*scale*Mathf.PI
 		//z太靠后 会被刷新到最前，物体0+z
@@ -97,7 +98,7 @@ public class WorldGenerater : MonoBehaviour
         uvs=new Vector2[(xCount+1)*(zCount)];
 
         // 半径
-        float radius=xCount*scale*0.5f;
+        float radius=xCount*0.5f;
 
         int index=0;
 		StringBuilder loga=new StringBuilder();
@@ -113,27 +114,30 @@ public class WorldGenerater : MonoBehaviour
 				// xCount-1 保证每一圈最后一个顶点 和第一个顶点位置相同
                 float angle=(float)x/(float)(xCount-1)*Mathf.PI * 2f;
 				
-                vertices[index]=new Vector3(Mathf.Cos(angle)*radius,Mathf.Sin(angle)*radius,z*scale*Mathf.PI);
+                vertices[index]=new Vector3(Mathf.Cos(angle)*radius,Mathf.Sin(angle)*radius,z*Mathf.PI);
 				//平面模式检查模型错误
 				// vertices[index]=new Vector3(angle,angle,z*scale*Mathf.PI);
 				
 				loga.AppendLine(vertices[index].ToString());
 
 
-                uvs[index]=new Vector2(x*scale,z*scale);
+                uvs[index]=new Vector2(x,z);
 
                 //柏林噪声偏移
                 float px=vertices[index].x*perlinScale+offset;
+				px= vertices[index].x/(xCount-1);
+				// Debug.Log(vertices[index].x/Mathf.PI);
                 float py=vertices[index].z*perlinScale+offset;
-				// py=vertices[index].z*;
-				Debug.Log(py);
+				py=vertices[index].z*0.06f+100;
+				py=vertices[index].z/Mathf.PI;
+				Debug.Log(vertices[index].z/Mathf.PI);
                 //中心线 顶点延归一化法线做偏移
                 Vector3 center=new Vector3(0,0,vertices[index].z);
                 vertices[index]+=(center-vertices[index]).normalized*Mathf.PerlinNoise(px,py)*waveHeight;
                 index++;
             }
         }
-		Debug.Log(loga);
+		// Debug.Log(loga);
         //三角形数组  一个矩形2个三角形 每个三角形三个顶点
         triangle=new int[xCount*(zCount-1)*6];
         //创建二位数组存储顶点方便调用
@@ -158,7 +162,7 @@ public class WorldGenerater : MonoBehaviour
 				};
 			
 				for(int j=0;j<6;j++){
-					Debug.Log(current+j);
+					// Debug.Log(current+j);
 					triangle[current+j]=boxBase[j];
 				}
 				current+=6;
@@ -166,7 +170,7 @@ public class WorldGenerater : MonoBehaviour
 			}
         }
 		for(int i=0;i<triangle.Length;i++){
-			Debug.Log(triangle[i]);
+			// Debug.Log(triangle[i]);
 		}
     }
     
