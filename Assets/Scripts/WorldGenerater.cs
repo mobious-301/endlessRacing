@@ -15,6 +15,9 @@ public class WorldGenerater : MonoBehaviour
     
     public float offset;
     public float waveHeight;
+	public float positionz;
+
+	public float globalSpeed;
 	GameObject[] pieces=new GameObject[2];
     // Start is called before the first frame update
     void Start()
@@ -36,6 +39,15 @@ public class WorldGenerater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+				//位置重制使用相对位置，避免时间精度导致位置偏移
+		for(int i=0;i<2;i++){
+			if(pieces[0].transform.position.z<-(int)dimensions.y*Mathf.PI+positionz){
+				pieces[0].transform.position =pieces[1].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI;
+			}
+			if(pieces[1].transform.position.z<-(int)dimensions.y*Mathf.PI+positionz){
+				pieces[1].transform.position =pieces[0].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI;
+			}
+		}
         
     }
     GameObject CreateCyLinder(){
@@ -44,7 +56,7 @@ public class WorldGenerater : MonoBehaviour
 
 		//添加移动脚本
 		BasicMovement BasicMovement=newCyLinder.AddComponent<BasicMovement>();
-
+		BasicMovement.speed=-globalSpeed;
 
         MeshFilter meshFilter=newCyLinder.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer=newCyLinder.AddComponent<MeshRenderer>();
@@ -54,7 +66,7 @@ public class WorldGenerater : MonoBehaviour
         meshFilter.mesh=Generate();
 
         //碰撞
-        // newCyLinder.AddComponent<MeshCollider>();
+        newCyLinder.AddComponent<MeshCollider>();
 
 
         //三角型
