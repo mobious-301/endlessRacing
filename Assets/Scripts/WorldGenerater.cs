@@ -14,20 +14,36 @@ public class WorldGenerater : MonoBehaviour
     
     public float offset;
     public float waveHeight;
+	GameObject[] pieces=new GameObject[2];
     // Start is called before the first frame update
     void Start()
     {
-        CreateCyLinder();
+        for(int i=0;i<2;i++){
+            GeneratWorldPice(i);
+        }
     }
+		void GeneratWorldPice(int i){
+		//初始化位置
+		pieces[i]= CreateCyLinder();
+		pieces[i].transform.Translate(Vector3.forward*(dimensions.y-1)*scale*Mathf.PI*i);
+
+		//函数标记尾部位置 z=z*scale*Mathf.PI
+		//z太靠后 会被刷新到最前，物体0+z
+		}
+
 
     // Update is called once per frame
     void Update()
     {
         
     }
-    void CreateCyLinder(){
+    GameObject CreateCyLinder(){
         GameObject newCyLinder=new GameObject();
         newCyLinder.name="World piece";
+
+		//添加移动脚本
+		BasicMovement BasicMovement=newCyLinder.AddComponent<BasicMovement>();
+
 
         MeshFilter meshFilter=newCyLinder.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer=newCyLinder.AddComponent<MeshRenderer>();
@@ -41,6 +57,7 @@ public class WorldGenerater : MonoBehaviour
 
 
         //三角型
+		return newCyLinder;
 
 
 
@@ -48,7 +65,7 @@ public class WorldGenerater : MonoBehaviour
 
     }
 
-    private Mesh Generate(){
+    Mesh Generate(){
         Mesh mesh=new Mesh();
         mesh.name="mesh";
         //uv 顶点三角形
@@ -108,6 +125,8 @@ public class WorldGenerater : MonoBehaviour
                 //柏林噪声偏移
                 float px=vertices[index].x*perlinScale+offset;
                 float py=vertices[index].z*perlinScale+offset;
+				// py=vertices[index].z*;
+				Debug.Log(py);
                 //中心线 顶点延归一化法线做偏移
                 Vector3 center=new Vector3(0,0,vertices[index].z);
                 vertices[index]+=(center-vertices[index]).normalized*Mathf.PerlinNoise(px,py)*waveHeight;

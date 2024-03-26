@@ -13,20 +13,58 @@ public class WorldGeneratercopy : MonoBehaviour
     
     public float offset;
     public float waveHeight;
+
+
+	public float globalSpeed;
+
+	public float positionz; //圆柱体0点刷新的偏移值
+	GameObject[] pieces=new GameObject[2];
+    // private object pz;
+
     // Start is called before the first frame update
     void Start()
     {
-        CreateCyLinder();
+		for(int i=0;i<2;i++){
+            GeneratWorldPice(i);
+        }
+        
     }
+	void GeneratWorldPice(int i){
+		//初始化位置
+		pieces[i]= CreateCyLinder();
+		pieces[i].transform.Translate(Vector3.forward*dimensions.y*scale*Mathf.PI*i);
+
+		//函数标记尾部位置 z=z*scale*Mathf.PI
+		//z太靠后 会被刷新到最前，物体0+z
+
+    }
+	void UpdateSinglePiece(GameObject pieces){
+		BasicMovement movement=pieces.AddComponent<BasicMovement>();
+		movement.speed=-globalSpeed;
+
+	}
 
     // Update is called once per frame
     void Update()
     {
+		//位置重制使用相对位置，避免时间精度导致位置偏移
+		for(int i=0;i<2;i++){
+			if(pieces[0].transform.position.z<-(int)dimensions.y*scale*Mathf.PI+positionz){
+				pieces[0].transform.position =pieces[1].transform.position+Vector3.forward*dimensions.y*scale*Mathf.PI;
+			}
+			if(pieces[1].transform.position.z<-(int)dimensions.y*scale*Mathf.PI+positionz){
+				pieces[1].transform.position =pieces[0].transform.position+Vector3.forward*dimensions.y*scale*Mathf.PI;
+			}
+		}
         
     }
-    void CreateCyLinder(){
+    GameObject CreateCyLinder(){
         GameObject newCyLinder=new GameObject();
         newCyLinder.name="World piece";
+
+		//添加移动脚本
+		BasicMovement BasicMovement=newCyLinder.AddComponent<BasicMovement>();
+		BasicMovement.speed=-globalSpeed;
 
         MeshFilter meshFilter=newCyLinder.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer=newCyLinder.AddComponent<MeshRenderer>();
@@ -36,10 +74,11 @@ public class WorldGeneratercopy : MonoBehaviour
         meshFilter.mesh=Generate();
 
         //碰撞
-        // newCyLinder.AddComponent<MeshCollider>();
+        newCyLinder.AddComponent<MeshCollider>();
 
 
         //三角型
+		return newCyLinder;
 
 
 
@@ -96,7 +135,7 @@ public class WorldGeneratercopy : MonoBehaviour
 
                 uvs[index]=new Vector2(x*scale,z*scale);
 
-                //柏林噪声偏移
+                //柏林噪声偏移 柏林噪声还要考虑连续性 以uv_st 的概念为基础
                 float px=vertices[index].x*perlinScale+offset;
                 float py=vertices[index].z*perlinScale+offset;
                 //中心线 顶点延归一化法线做偏移
@@ -168,6 +207,8 @@ public class WorldGeneratercopy : MonoBehaviour
 				//now use our perlin scale and offset to create x and z values for the perlin noise
 				float pX = (vertices[index].x * perlinScale) + offset;
 				float pZ = (vertices[index].z * perlinScale) + offset;
+				// pZ=vertices[index].z/vertices[vertices.Length-xCount-zCount].z*8%1;
+				// Debug.Log(pZ);
 				
 				//get the center of the cylinder but keep the z of this vertice so we can point inwards to the center
 				Vector3 center = new Vector3(0, 0, vertices[index].z);

@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class BasicMovement : MonoBehaviour
 {
-    public float speed;
+    public float speed=0;
     // Start is called before the first frame update
     void Start()
     {
+
         
     }
 
@@ -17,4 +18,5 @@ public class BasicMovement : MonoBehaviour
         transform.Translate(Vector3.forward*speed*Time.deltaTime);
         
     }
+    
 }
