@@ -18,6 +18,18 @@ public class WorldGenerater : MonoBehaviour
 	public float positionz;
 
 	public float globalSpeed;
+
+	public float scale;
+	public int rollsize;
+
+
+	//生成门
+	public GameObject gate;
+	public GameObject currentCyLiner;
+	public GameObject[] obstacles;
+	//生成概率控制
+	public int startObstacleChance;
+	public int gateChance;
 	GameObject[] pieces=new GameObject[2];
     // Start is called before the first frame update
     void Start()
@@ -29,10 +41,11 @@ public class WorldGenerater : MonoBehaviour
 		void GeneratWorldPice(int i){
 		//初始化位置
 		pieces[i]= CreateCyLinder();
-		pieces[i].transform.Translate(Vector3.forward*(dimensions.y-1)*Mathf.PI*i);
+		pieces[i].transform.Translate(Vector3.forward*(dimensions.y-1)*Mathf.PI*rollsize*i);
 
 		//函数标记尾部位置 z=z*scale*Mathf.PI
 		//z太靠后 会被刷新到最前，物体0+z
+		
 		}
 
 
@@ -41,11 +54,11 @@ public class WorldGenerater : MonoBehaviour
     {
 				//位置重制使用相对位置，避免时间精度导致位置偏移
 		for(int i=0;i<2;i++){
-			if(pieces[0].transform.position.z<-(int)dimensions.y*Mathf.PI+positionz){
-				pieces[0].transform.position =pieces[1].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI;
+			if(pieces[0].transform.position.z<-(int)dimensions.y*Mathf.PI*rollsize+positionz){
+				pieces[0].transform.position =pieces[1].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI*rollsize;
 			}
-			if(pieces[1].transform.position.z<-(int)dimensions.y*Mathf.PI+positionz){
-				pieces[1].transform.position =pieces[0].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI;
+			if(pieces[1].transform.position.z<-(int)dimensions.y*Mathf.PI*rollsize+positionz){
+				pieces[1].transform.position =pieces[0].transform.position+Vector3.forward*(dimensions.y-1)*Mathf.PI*rollsize;
 			}
 		}
         
@@ -57,6 +70,10 @@ public class WorldGenerater : MonoBehaviour
 		//添加移动脚本
 		BasicMovement BasicMovement=newCyLinder.AddComponent<BasicMovement>();
 		BasicMovement.speed=-globalSpeed;
+
+
+		//设置创建中的元素
+		currentCyLiner = newCyLinder;
 
         MeshFilter meshFilter=newCyLinder.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer=newCyLinder.AddComponent<MeshRenderer>();
@@ -110,7 +127,7 @@ public class WorldGenerater : MonoBehaviour
         uvs=new Vector2[(xCount+1)*(zCount)];
 
         // 半径
-        float radius=xCount*0.5f;
+        float radius=xCount*0.5f*scale;
 
         int index=0;
 		StringBuilder loga=new StringBuilder();
@@ -126,7 +143,7 @@ public class WorldGenerater : MonoBehaviour
 				// xCount-1 保证每一圈最后一个顶点 和第一个顶点位置相同
                 float angle=(float)x/(float)(xCount-1)*Mathf.PI * 2f;
 				
-                vertices[index]=new Vector3(Mathf.Cos(angle)*radius,Mathf.Sin(angle)*radius,z*Mathf.PI);
+                vertices[index]=new Vector3(Mathf.Cos(angle)*radius,Mathf.Sin(angle)*radius,z*Mathf.PI*rollsize);
 				//平面模式检查模型错误
 				// vertices[index]=new Vector3(angle,angle,z*scale*Mathf.PI);
 				
@@ -141,11 +158,16 @@ public class WorldGenerater : MonoBehaviour
 				// Debug.Log(vertices[index].x/Mathf.PI);
                 float py=vertices[index].z*perlinScale+offset;
 				py=vertices[index].z*0.06f+100;
-				py=vertices[index].z/Mathf.PI;
+				py=vertices[index].z/Mathf.PI/rollsize;
 				Debug.Log(vertices[index].z/Mathf.PI);
                 //中心线 顶点延归一化法线做偏移
                 Vector3 center=new Vector3(0,0,vertices[index].z);
                 vertices[index]+=(center-vertices[index]).normalized*Mathf.PerlinNoise(px,py)*waveHeight;
+
+				if(UnityEngine.Random.Range(0,startObstacleChance)==0&&!(gate==null&& obstacles.Length == 0))
+				{
+					CreatIteam(vertices[index], x);
+				}
                 index++;
             }
         }
@@ -185,7 +207,24 @@ public class WorldGenerater : MonoBehaviour
 			// Debug.Log(triangle[i]);
 		}
     }
-    
+    public Transform GetWorldPiece(){
+		//return the first world piece
+		return pieces[0].transform;
+	}
+	void CreatIteam(Vector3 vert,int x){
+		// GameObject newIteam=Instantiate(gate);
+		GameObject newIteam = Instantiate((UnityEngine.Random.Range(0, gateChance) == 0) ? gate : obstacles[0]);
+		newIteam.transform.position=vert;
+
+		//旋转
+		Vector3 Zcenter=new Vector3(0,0,vert.z);
+		newIteam.transform.rotation=Quaternion.LookRotation(Zcenter-vert,Vector3.up);
+		//缩放
+		newIteam.transform.localScale=new Vector3(200,200,200);
+		//绑定父物体
+		newIteam.transform.SetParent(currentCyLiner.transform,false);
+
+	}
 
 	
 }
