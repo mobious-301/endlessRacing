@@ -159,7 +159,7 @@ public class WorldGenerater : MonoBehaviour
                 float py=vertices[index].z*perlinScale+offset;
 				py=vertices[index].z*0.06f+100;
 				py=vertices[index].z/Mathf.PI/rollsize;
-				Debug.Log(vertices[index].z/Mathf.PI);
+				// Debug.Log(vertices[index].z/Mathf.PI);
                 //中心线 顶点延归一化法线做偏移
                 Vector3 center=new Vector3(0,0,vertices[index].z);
                 vertices[index]+=(center-vertices[index]).normalized*Mathf.PerlinNoise(px,py)*waveHeight;

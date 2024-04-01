@@ -63,7 +63,7 @@ public class skridmark : MonoBehaviour
         
             if(Mathf.Abs(Input.GetAxis("Horizontal")) >=0.9){
                 if(car.onground[i]==true){
-                    Debug.Log("true");
+                    // Debug.Log("true");
                             return true;
                 }
             }

@@ -8,10 +8,10 @@ public class Car : MonoBehaviour
     public WheelCollider[] whellColliders;
 
     public int rotationSpeed;
-    public int rotationAngel;
+    public int rotationAngle;
     public int whellRotateSpeed;
-    public int TargetRotation;
-    public float TargetRotationV;
+     int TargetRotation;
+    // public float TargetRotationV;
     public int rotationvertical;
 
 //粒子射线判断的长度
@@ -19,6 +19,8 @@ public class Car : MonoBehaviour
     public bool[] onground=new bool[4];
 
     public GameObject car;
+    public GameObject ragdoll;
+	public AudioSource scoreAudio;    
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +35,7 @@ public class Car : MonoBehaviour
     }
     void FixedUpdate()
     {
+        // Debug.Log("FixedUpdate");
         for(int i=0;i<whellColliders.Length;i++){
             Quaternion quat;
             Vector3 pos;
@@ -42,6 +45,7 @@ public class Car : MonoBehaviour
         }
         if(Input.GetMouseButton(0)||Input.GetAxis("Horizontal")!=0||Input.GetAxis("Vertical")!=0){
             UpdateTargetRotation();
+            // Debug.Log("GetMouseButton");
         }
         else{
             TargetRotation=0;
@@ -62,14 +66,15 @@ UpdateEffect();
         //旋转
         if(Input.GetAxis("Horizontal")!=0){
             if(Input.mousePosition.x>Screen.width*0.5f){
-                TargetRotation=rotationAngel;
+                TargetRotation=rotationAngle;
             }else{
-                TargetRotation=-rotationAngel;
+                TargetRotation=-rotationAngle;
             }
         }
 
         {//ad方向键旋转
-            TargetRotation= (int)(rotationAngel*Input.GetAxis("Horizontal"));
+            TargetRotation= (int)(rotationAngle*Input.GetAxis("Horizontal"));
+            // Debug.Log(rotationAngle);
         }
     }
 
@@ -88,4 +93,11 @@ UpdateEffect();
             }
         }
     }
+
+    //碰撞代理
+    public void FallApart(){
+		//destroy the car
+		Instantiate(ragdoll, transform.position, transform.rotation);
+		gameObject.SetActive(false);
+	}
 }

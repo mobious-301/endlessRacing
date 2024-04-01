@@ -64,15 +64,22 @@
     <Analyzer Include="D:\unity\2022.3.15f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Obstacle.cs" />
     <Compile Include="Assets\Scripts\TestBerlin.cs" />
     <Compile Include="Assets\Scripts\planGenerate.cs" />
     <Compile Include="Assets\Scripts\Car.cs" />
+    <Compile Include="Assets\Scripts\CarGameOverTrigger.cs" />
     <Compile Include="Assets\Scripts\BasicMovement.cs" />
     <Compile Include="Assets\Scripts\WorldGeneratercopy.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\WorldGenerater.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\startGame.cs" />
+    <Compile Include="Assets\Scripts\UImanager.cs" />
+    <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Scripts\skridmark.cs" />
+    <Compile Include="Assets\Scripts\Gate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
